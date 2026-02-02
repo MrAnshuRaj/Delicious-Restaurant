@@ -1,4 +1,4 @@
-import MenuHero from "../components/Menu/MenuHero";
+import MenuHeroCarousel from "../components/Menu/MenuHeroCarousel";
 import MenuCategory from "../components/Menu/MenuCategory";
 import MenuCTA from "../components/Menu/MenuCTA";
 
@@ -171,7 +171,7 @@ const Menu = () => {
 
   return (
     <div className="min-h-screen">
-      <MenuHero />
+      <MenuHeroCarousel />
 
       <MenuCategory
         title="Appetizers"

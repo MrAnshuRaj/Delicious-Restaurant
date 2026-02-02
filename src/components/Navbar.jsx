@@ -8,22 +8,25 @@ const Navbar = () => {
   const location = useLocation();
 
   const isHome = location.pathname === "/";
+  const isMenu = location.pathname === "/menu";
 
   useEffect(() => {
-    if (!isHome) {
+    // For Home and Menu, navbar is transparent over hero, then turns white after scroll
+    if (isHome || isMenu) {
+      const getHeroHeight = () => {
+        // Hero is full viewport height (h-screen)
+        return window.innerHeight;
+      };
+      const handleScroll = () => {
+        setIsScrolled(window.scrollY > getHeroHeight() - 80);
+      };
+      window.addEventListener("scroll", handleScroll);
+      handleScroll();
+      return () => window.removeEventListener("scroll", handleScroll);
+    } else {
       setIsScrolled(true);
-      return;
     }
-
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > window.innerHeight - 80);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isHome]);
+  }, [isHome, isMenu]);
 
   const navLinks = [
     { label: "Home", path: "/" },
