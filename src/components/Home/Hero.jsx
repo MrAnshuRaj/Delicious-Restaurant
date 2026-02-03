@@ -12,43 +12,41 @@ const Hero = () => {
 
   useEffect(() => {
     const onScroll = () => {
-      const scroll = window.scrollY;
-      const heroHeight = window.innerHeight * 1.2;
+      const scrollY = window.scrollY;
+      const heroHeight = window.innerHeight * 1.1;
 
-      // Clamp progress between 0–1
-      const progress = Math.min(scroll / heroHeight, 1);
+      // Progress: 0 → 1
+      const progress = Math.min(scrollY / heroHeight, 1);
 
-      /* BACKGROUND */
-      bgRef.current.style.transform = `translateY(${scroll * 0.08}px)`;
+      /* BACKGROUND (slowest) */
+      bgRef.current.style.transform = `translateY(${scrollY * 0.08}px)`;
 
-      /* MID */
-      midRef.current.style.transform = `translateY(${scroll * 0.15}px)`;
+      /* MIDGROUND */
+      midRef.current.style.transform = `translateY(${scrollY * 0.16}px)`;
 
-      /* BURGER – smooth growth + slight vertical move */
-      const burgerScale = 0.7 + progress * 0.6;
-      const burgerY = scroll * 0.12;
+      /* BURGER (foreground, overtakes text) */
+      const burgerScale = 1.45 + progress * 1.5;
+      const burgerY = scrollY * 0.14;
 
       burgerRef.current.style.transform = `
         translate(-50%, ${burgerY}px)
         scale(${burgerScale})
       `;
 
-      /* TEXT – centered → moves up → fades → disappears */
-      const textMove = progress * -120;
-      const textOpacity = 1 - progress * 1.3;
+      /* TEXT (scene-based parallax, NOT fixed) */
+      const textY = progress * -140; // moves up
+      const textScale = 1 - progress * 0.15;
+      const textOpacity = 1 - progress * 1.1;
 
       textRef.current.style.transform = `
-        translate(-50%, calc(-50% + ${textMove}px))
+        translate(-50%, calc(-50% + ${textY}px))
+        scale(${textScale})
       `;
       textRef.current.style.opacity = Math.max(textOpacity, 0);
-
-      // Hide text completely after hero
-      if (progress >= 0.9) {
-        textRef.current.style.display = "none";
-      } else {
-        textRef.current.style.display = "block";
-      }
     };
+
+    // Run once to avoid jump on reload
+    onScroll();
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -56,8 +54,8 @@ const Hero = () => {
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative h-[120vh] overflow-hidden bg-black">
+      {/* HERO SCENE */}
+      <section className="relative h-[115vh] overflow-hidden bg-black">
         {/* BACKGROUND */}
         <div
           ref={bgRef}
@@ -65,19 +63,20 @@ const Hero = () => {
           style={{ backgroundImage: `url(${bg})` }}
         />
 
-        {/* MID LAYER */}
+        {/* MIDGROUND */}
         <img
           ref={midRef}
           src={mid}
           alt=""
           className="absolute bottom-0 w-full will-change-transform z-10"
         />
-        {/* TEXT LAYER (STABLE CENTERED) */}
+
+        {/* TEXT (MID LAYER — BEHIND BURGER) */}
         <div
           ref={textRef}
           className="
-            fixed
-            top-1/2
+            absolute
+            top-[38%]
             left-1/2
             z-20
             text-center
@@ -85,7 +84,7 @@ const Hero = () => {
             will-change-transform
           "
           style={{
-            transform: "translate(-50%, calc(-50% + var(--text-offset, 0px)))",
+            transform: "translate(-50%, -50%) scale(1)",
             opacity: 1,
           }}
         >
@@ -93,10 +92,9 @@ const Hero = () => {
             Experience the{" "}
             <span className="text-[#d4af37]">Depth of Flavor</span>
           </h1>
-
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          {/* <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             A culinary journey inspired by tradition and elevated by craft.
-          </p>
+          </p> */}
         </div>
 
         {/* BURGER (FRONT) */}
@@ -112,20 +110,20 @@ const Hero = () => {
             max-w-none
             z-30
             pointer-events-none
-            drop-shadow-[0_80px_120px_rgba(0,0,0,0.6)]
             will-change-transform
+            drop-shadow-[0_80px_120px_rgba(0,0,0,0.6)]
           "
           style={{
-            transform: "translate(-50%, 0) scale(0.7)",
+            transform: "translate(-50%, 0) scale(0.65)",
           }}
         />
 
-        {/* FADE TO NEXT SECTION */}
+        {/* FADE INTO NEXT SECTION */}
         <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-b from-transparent to-[#f2efe9] z-40" />
       </section>
 
       {/* NEXT SECTION */}
-      <section className="bg-[#f2efe9] py-32" />
+      <section className="bg-[#f2efe9] py-5" />
     </>
   );
 };
